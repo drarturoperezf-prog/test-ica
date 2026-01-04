@@ -296,15 +296,14 @@
       <h1>Antes de ver tu resultado</h1>
       <p>Déjanos tus datos para enviarte tu resultado y, si lo deseas, ayudarte de forma individual.</p>
 
-      <input id="leadNombre" type="text" placeholder="Nombre" autocomplete="name" />
-      <input id="leadEmail" type="email" placeholder="Email" autocomplete="email" />
-      <input id="leadTel" type="tel" placeholder="Teléfono" autocomplete="tel" />
+      <input id="leadNombre" type="text" placeholder="Nombre" autocomplete="name" required />
+      <input id="leadEmail" type="email" placeholder="Email" autocomplete="email" required />
+      <input id="leadTel" type="tel" placeholder="Teléfono" autocomplete="tel" required />
 
       <div class="hint">Al enviar, aceptas que podamos contactarte por estos medios. (No sustituye consulta médica.)</div>
       <div class="error" id="err7">Revisa: nombre, email válido y teléfono.</div>
 
       <button class="btn primary" onclick="submitLeadsAndResult()">Ver mi resultado</button>
-      <button class="btn secondary" onclick="skipLeads()">Omitir y ver resultado</button>
     </div>
   </div>
 
@@ -395,9 +394,7 @@
     calculateResult();
   }
 
-  function skipLeads(){
-    calculateResult();
-  }
+
 
   function calculateResult(){
     const cintura = parseFloat(document.getElementById('cintura').value);
