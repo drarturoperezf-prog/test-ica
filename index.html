@@ -212,7 +212,24 @@
 <div class="screen" id="s7">
   <h1 id="resultTitle"></h1>
   <div class="result" id="resultBox">
-    <p id="resultText"></p>
+  
+    <!-- Semáforo -->
+<div class="semaforo">
+  <div class="luz verde" id="luzVerde" title="Bajo"></div>
+  <div class="luz ambar" id="luzAmbar" title="Moderado"></div>
+  <div class="luz roja" id="luzRoja" title="Elevado"></div>
+</div>
+
+<!-- Barra de riesgo -->
+<div class="riskbar">
+  <div class="riskfill" id="riskFill"></div>
+</div>
+
+<!-- Badge -->
+<div class="badge low" id="riskBadge">Bajo</div>
+
+<p id="resultText"></p>
+
   </div>
   <a class="btn" href="https://instagram.com/" target="_blank">
     Escribirme por Instagram
@@ -260,6 +277,33 @@
     document.getElementById('resultTitle').innerText = title;
     document.getElementById('resultText').innerText = text;
     document.getElementById('resultBox').className = "result " + cls;
+    // --- Activar semáforo + barra + badge ---
+const luzVerde = document.getElementById('luzVerde');
+const luzAmbar = document.getElementById('luzAmbar');
+const luzRoja  = document.getElementById('luzRoja');
+const riskFill = document.getElementById('riskFill');
+const riskBadge = document.getElementById('riskBadge');
+
+// Reset luces
+luzVerde.classList.remove('on');
+luzAmbar.classList.remove('on');
+luzRoja.classList.remove('on');
+
+// Barra: asigna clase para que cambie ancho/color por CSS
+riskFill.className = 'riskfill ' + cls;
+
+// Badge: texto + clase
+riskBadge.className = 'badge ' + cls;
+
+if (cls === 'low') {
+  luzVerde.classList.add('on');
+  riskBadge.textContent = 'Bajo';
+} else if (cls === 'moderate') {
+  luzAmbar.classList.add('on');
+  riskBadge.textContent = 'Moderado';
+} else {
+  luzRoja.classList.add('on');
+  riskBadge.textContent = 'Elevado';
   }
 </script>
 
