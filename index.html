@@ -1,486 +1,210 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Test ICA · Riesgo cardiometabólico</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test ICA · Riesgo cardiometabólico</title>
 
-  <style>
-    :root{
-      --bg:#f5f7fb;
-      --card:#ffffff;
-      --text:#0f172a;
-      --muted:#64748b;
-      --border:#e2e8f0;
-      --shadow: 0 14px 30px rgba(2,6,23,.08);
+<style>
+body{
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial;
+  background:#f4f6fb;
+  margin:0;
+  color:#111;
+}
+.screen{display:none; max-width:480px; margin:0 auto; padding:24px;}
+.screen.active{display:block;}
+.card{
+  background:#fff;
+  border-radius:20px;
+  padding:24px;
+  box-shadow:0 20px 40px rgba(0,0,0,.08);
+}
+h1{font-size:26px;margin-bottom:12px}
+p{line-height:1.5;color:#444}
 
-      --green:#22c55e;
-      --amber:#f59e0b;
-      --red:#ef4444;
+input{
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  border-radius:12px;
+  border:1px solid #ddd;
+  font-size:16px;
+}
 
-      --greenBg:#e8f8ef;
-      --amberBg:#fff4d6;
-      --redBg:#fde3e3;
-    }
+.btn{
+  width:100%;
+  padding:16px;
+  border-radius:14px;
+  border:none;
+  font-size:16px;
+  font-weight:700;
+  cursor:pointer;
+  margin-top:16px;
+}
+.btn.primary{
+  background:linear-gradient(135deg,#111827,#334155);
+  color:#fff;
+}
+.badge{
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:14px;
+}
+.low{background:#dcfce7;color:#166534}
+.moderate{background:#fef3c7;color:#92400e}
+.high{background:#fee2e2;color:#991b1b}
 
-    *{ box-sizing:border-box; }
-    body{
-      margin:0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+.resultbox{
+  border-radius:16px;
+  padding:18px;
+  margin-top:16px;
+}
+.result-low{background:#ecfdf5;border-left:6px solid #22c55e}
+.result-moderate{background:#fffbeb;border-left:6px solid #f59e0b}
+.result-high{background:#fef2f2;border-left:6px solid #ef4444}
 
-    .screen{ display:none; padding:24px; max-width: 520px; margin: 0 auto; min-height: 100vh; }
-    .screen.active{ display:block; }
-
-    .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: var(--shadow);
-    }
-
-    h1{ font-size: 34px; line-height: 1.05; margin: 6px 0 10px; }
-    h2{ font-size: 22px; margin: 0 0 10px; }
-    p{ color: var(--muted); font-size: 16px; line-height: 1.55; margin: 0 0 14px; }
-
-    .mini{
-      display:flex; gap:8px; align-items:center;
-      color: var(--muted); font-size: 14px; margin-top: 10px;
-    }
-
-    input{
-      width: 100%;
-      padding: 14px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      font-size: 16px;
-      outline: none;
-      margin: 12px 0 0;
-      background:#fff;
-    }
-    input:focus{ border-color:#cbd5e1; box-shadow: 0 0 0 4px rgba(59,130,246,.08); }
-
-    .btn{
-      display:block;
-      width:100%;
-      margin-top: 16px;
-      padding: 16px;
-      border-radius: 14px;
-      border: 0;
-      cursor:pointer;
-      font-weight: 800;
-      font-size: 18px;
-      text-align:center;
-      text-decoration:none;
-      transition:.15s ease;
-      user-select:none;
-    }
-
-    .btn.primary{
-      color:#fff;
-      background: linear-gradient(135deg, #111827 0%, #334155 60%, #0f172a 100%);
-      box-shadow: 0 14px 30px rgba(2,6,23,.18);
-    }
-    .btn.primary:hover{ transform: translateY(-1px); }
-    .btn.primary:active{ transform: translateY(0); }
-
-    .btn.secondary{
-      background:#fff;
-      color:#0f172a;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 18px rgba(2,6,23,.06);
-      font-weight: 800;
-    }
-
-    .choices{ display:flex; flex-direction:column; gap:12px; margin-top: 18px; }
-
-    /* ===== Resultado look "clínico + semáforo" ===== */
-    .resultBox{
-      margin-top: 14px;
-      padding: 18px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 14px 30px rgba(2,6,23,.08);
-      background:#fff;
-    }
-    .resultBox.low{
-      background: var(--greenBg);
-      border-left: 8px solid var(--green);
-    }
-    .resultBox.moderate{
-      background: var(--amberBg);
-      border-left: 8px solid var(--amber);
-    }
-    .resultBox.high{
-      background: var(--redBg);
-      border-left: 8px solid var(--red);
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-weight: 900;
-      font-size: 14px;
-      border: 1px solid var(--border);
-      margin: 10px 0 14px;
-      background:#fff;
-    }
-    .badge.low{ color:#167a3c; border-color:#bfe8cc; background:#f7feed; }
-    .badge.moderate{ color:#8a5a00; border-color:#ffe2a3; background:#fff4d6; }
-    .badge.high{ color:#a11a1a; border-color:#f7bcbc; background:#fde3e3; }
-
-    /* Semáforo */
-    .semaforo{
-      display:flex;
-      justify-content:center;
-      gap:12px;
-      margin: 12px 0 10px;
-    }
-    .luz{
-      width: 18px;
-      height: 18px;
-      border-radius: 999px;
-      background:#ddd;
-      box-shadow: inset 0 0 0 2px rgba(0,0,0,.08);
-      opacity: .35;
-    }
-    .luz.on{ opacity: 1; }
-    .luz.verde.on{ background: var(--green); }
-    .luz.ambar.on{ background: var(--amber); }
-    .luz.roja.on{ background: var(--red); }
-
-    /* Barra de riesgo */
-    .riskbar{
-      height: 10px;
-      background:#e5e7eb;
-      border-radius: 999px;
-      overflow:hidden;
-      margin: 10px 0 12px;
-    }
-    .riskfill{
-      height: 100%;
-      width: 33%;
-      background: var(--green);
-      transition: width .25s ease;
-    }
-    .riskfill.moderate{ width: 66%; background: var(--amber); }
-    .riskfill.high{ width: 100%; background: var(--red); }
-
-    .hint{
-      margin-top: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-
-    .error{
-      display:none;
-      margin-top: 10px;
-      color:#b91c1c;
-      font-size: 13px;
-      font-weight: 700;
-    }
-
-    .icaRow{
-      display:flex;
-      gap:10px;
-      align-items:center;
-      margin: 10px 0 0;
-    }
-  </style>
+.small{font-size:13px;color:#666}
+.error{color:#b91c1c;font-size:14px;display:none}
+</style>
 </head>
 
 <body>
 
-  <!-- PANTALLA 1 -->
-  <div class="screen active" id="s1">
-    <div class="card">
-      <h1>¿Tu grasa abdominal está poniendo en riesgo tu salud?</h1>
-      <p>Este test rápido se basa en el índice cintura-altura (ICA), un marcador más útil que el peso para valorar riesgo cardiometabólico.</p>
-      <div class="mini">⏱️ 2 minutos · No es un diagnóstico médico.</div>
-      <button class="btn primary" onclick="showScreen('s2')">Empezar el test</button>
-    </div>
+<!-- PANTALLA 1 -->
+<div class="screen active" id="s1">
+  <div class="card">
+    <h1>¿Tu grasa abdominal pone en riesgo tu salud?</h1>
+    <p>Test rápido basado en el índice cintura-altura (ICA).</p>
+    <button class="btn primary" onclick="showScreen('s2')">Empezar</button>
   </div>
+</div>
 
-  <!-- PANTALLA 2 -->
-  <div class="screen" id="s2">
-    <div class="card">
-      <h2>¿Cuál es tu perímetro de cintura? (cm)</h2>
-      <p>Mídela a la altura del ombligo, sin apretar.</p>
-      <input id="cintura" type="number" inputmode="numeric" placeholder="Ej. 95" />
-      <button class="btn primary" onclick="nextFromCintura()">Siguiente</button>
-      <button class="btn secondary" onclick="showScreen('s1')">Atrás</button>
-      <div class="error" id="err2">Revisa la cintura (número válido).</div>
-    </div>
+<!-- PANTALLA 2 -->
+<div class="screen" id="s2">
+  <div class="card">
+    <h1>Tus datos físicos</h1>
+    <input id="cintura" type="number" placeholder="Cintura (cm)">
+    <input id="altura" type="number" placeholder="Altura (cm)">
+    <button class="btn primary" onclick="calculateICA()">Continuar</button>
   </div>
+</div>
 
-  <!-- PANTALLA 3 -->
-  <div class="screen" id="s3">
-    <div class="card">
-      <h2>¿Cuál es tu altura? (cm)</h2>
-      <input id="altura" type="number" inputmode="numeric" placeholder="Ej. 170" />
-      <button class="btn primary" onclick="nextFromAltura()">Siguiente</button>
-      <button class="btn secondary" onclick="showScreen('s2')">Atrás</button>
-      <div class="error" id="err3">Revisa la altura (número válido).</div>
-    </div>
+<!-- PANTALLA 3 LEADS (OBLIGATORIOS) -->
+<div class="screen" id="s3">
+  <div class="card">
+    <h1>Antes de ver tu resultado</h1>
+    <p>Déjanos tus datos para enviarte tu resultado.</p>
+
+    <input id="leadNombre" placeholder="Nombre">
+    <input id="leadEmail" type="email" placeholder="Email">
+    <input id="leadTel" placeholder="Teléfono">
+
+    <div class="error" id="errLead">Completa todos los campos.</div>
+
+    <button class="btn primary" onclick="submitLeads()">Ver mi resultado</button>
+    <p class="small">No sustituye consulta médica.</p>
   </div>
+</div>
 
-  <!-- PANTALLA 4 -->
-  <div class="screen" id="s4">
-    <div class="card">
-      <h2>¿Te cuesta especialmente perder grasa abdominal aunque hagas dieta o ejercicio?</h2>
-      <div class="choices">
-        <button class="btn primary" onclick="answerClinical(1, 's5')">Sí</button>
-        <button class="btn secondary" onclick="answerClinical(0, 's5')">No</button>
-      </div>
-      <button class="btn secondary" onclick="showScreen('s3')">Atrás</button>
+<!-- PANTALLA 4 RESULTADO FINAL -->
+<div class="screen" id="s4">
+  <div class="card">
+    <h1 id="resultTitle"></h1>
+    <p><strong>ICA:</strong> <span id="icaValue"></span></p>
+
+    <div id="resultBox" class="resultbox">
+      <span class="badge" id="riskBadge"></span>
+      <p id="resultText"></p>
     </div>
+
+    <a class="btn primary"
+       href="https://www.instagram.com/dr.arturoperezf/"
+       target="_blank">
+       Escribirme por Instagram
+    </a>
   </div>
+</div>
 
-  <!-- PANTALLA 5 -->
-  <div class="screen" id="s5">
-    <div class="card">
-      <h2>¿Tienes o te han dicho alguna vez que tienes la tensión, el azúcar o el colesterol altos?</h2>
-      <div class="choices">
-        <button class="btn primary" onclick="answerClinical(1, 's6')">Sí</button>
-        <button class="btn secondary" onclick="answerClinical(0, 's6')">No</button>
-      </div>
-      <button class="btn secondary" onclick="showScreen('s4')">Atrás</button>
-    </div>
-  </div>
+<script>
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
 
-  <!-- PANTALLA 6 -->
-  <div class="screen" id="s6">
-    <div class="card">
-      <h2>¿Has recuperado peso varias veces después de haberlo perdido?</h2>
-      <div class="choices">
-        <button class="btn primary" onclick="answerClinical(1, 's7')">Sí</button>
-        <button class="btn secondary" onclick="answerClinical(0, 's7')">No</button>
-      </div>
-      <button class="btn secondary" onclick="showScreen('s5')">Atrás</button>
-    </div>
-  </div>
+// VARIABLES GLOBALES
+let ICA = 0;
+let RIESGO = "";
 
-  <!-- PANTALLA 7 (LEADS OBLIGATORIOS) -->
-  <div class="screen" id="s7">
-    <div class="card">
-      <h2>Antes de ver tu resultado</h2>
-      <p>Déjanos tus datos para enviarte tu resultado y, si lo deseas, ayudarte de forma individual.</p>
+// CALCULO
+function calculateICA(){
+  const c = parseFloat(cintura.value);
+  const a = parseFloat(altura.value);
+  if(!c || !a) return;
+  ICA = (c/a).toFixed(2);
+  showScreen('s3');
+}
 
-      <input id="leadNombre" type="text" placeholder="Nombre" autocomplete="name" required />
-      <input id="leadEmail" type="email" placeholder="Email" autocomplete="email" required />
-      <input id="leadTel" type="tel" placeholder="Teléfono" autocomplete="tel" required />
+// ENVIO LEADS + RESULTADO
+function submitLeads(){
+  const n = leadNombre.value.trim();
+  const e = leadEmail.value.trim();
+  const t = leadTel.value.trim();
 
-      <div class="hint">
-        Al enviar, aceptas que podamos contactarte por estos medios. (No sustituye consulta médica.)
-      </div>
+  if(!n || !e || !t){
+    errLead.style.display="block";
+    return;
+  }
+  errLead.style.display="none";
 
-      <div class="error" id="err7">Revisa: nombre, email válido y teléfono.</div>
+  let title, text, cls;
 
-      <button class="btn primary" onclick="submitLeadsAndResult()">Ver mi resultado</button>
+  if(ICA < 0.5){
+    title="🟢 Resultado: Riesgo cardiometabólico bajo";
+    text="Tu ICA está en rango favorable.";
+    cls="low";
+  } else if(ICA < 0.6){
+    title="🟠 Resultado: Señales de alerta metabólica";
+    text="Podría existir acumulación de grasa abdominal.";
+    cls="moderate";
+  } else {
+    title="🔴 Resultado: Riesgo cardiometabólico elevado";
+    text="Riesgo aumentado. Valora consulta profesional.";
+    cls="high";
+  }
 
-      <button class="btn secondary" onclick="showScreen('s6')">Atrás</button>
-    </div>
-  </div>
+  resultTitle.innerText = title;
+  icaValue.innerText = ICA;
+  resultText.innerText = text;
+  riskBadge.innerText = cls === "low" ? "Bajo" : cls === "moderate" ? "Moderado" : "Elevado";
+  riskBadge.className = "badge " + cls;
+  resultBox.className = "resultbox result-" + cls;
 
-  <!-- PANTALLA 8 (RESULTADO) -->
-  <div class="screen" id="s8">
-    <div class="card">
-      <h1 id="resultTitle">Resultado</h1>
+  // 🔴🔴🔴 CAMBIA SOLO ESTA URL 🔴🔴🔴
+  fetch("PEGA_AQUI_TU_WEBAPP_URL",{
+    method:"POST",
+    mode:"no-cors",
+    headers:{ "Content-Type":"application/x-www-form-urlencoded"},
+    body:new URLSearchParams({
+      nombre:n,
+      email:e,
+      telefono:t,
+      ica:ICA,
+      riesgo:cls
+    })
+  });
 
-      <div class="icaRow">
-        <div class="badge" style="background:#fff;">
-          ICA: <strong id="icaValue">—</strong>
-        </div>
-      </div>
+  localStorage.setItem("ica_done","1");
+  showScreen('s4');
+}
 
-      <div class="resultBox low" id="resultBox">
-        <!-- Semáforo -->
-        <div class="semaforo">
-          <div class="luz verde" id="luzVerde" title="Bajo"></div>
-          <div class="luz ambar" id="luzAmbar" title="Moderado"></div>
-          <div class="luz roja" id="luzRoja" title="Elevado"></div>
-        </div>
-
-        <!-- Barra -->
-        <div class="riskbar">
-          <div class="riskfill" id="riskFill"></div>
-        </div>
-
-        <!-- Badge -->
-        <div class="badge low" id="riskBadge">Bajo</div>
-
-        <p id="resultText"></p>
-      </div>
-
-      <a class="btn primary" href="https://www.instagram.com/dr.arturoperezf/" target="_blank" rel="noopener">
-        Escribirme por Instagram
-      </a>
-
-      <button class="btn secondary" onclick="showScreen('s1')">Repetir test</button>
-    </div>
-  </div>
-
-  <script>
-    // ===== CONFIG =====
-    const WEBAPP_URL = "https://script.google.com/macros/s/AKfycby2-U6fvjNmw7ojHatAQUSVuidKX5TcAN0ivozgIN5MD3w_YnJnQxFcHlP2l9Jh-4B62Q/exec";
-    // ^^^ TU_URL_WEBAPP (ya la puse con la tuya; si cambias el WebApp, reemplaza aquí)
-
-    // ===== Estado =====
-    let clinicalScore = 0;
-
-    // Guardamos el resultado para enviarlo al sheet
-    window.__ica = null;
-    window.__riesgo = null; // low | moderate | high
-
-    function showScreen(id){
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      const el = document.getElementById(id);
-      if (el) el.classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    function isEmailValid(email){
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    }
-
-    function nextFromCintura(){
-      const v = parseFloat(document.getElementById('cintura').value);
-      if (!v || v < 40 || v > 200){
-        document.getElementById('err2').style.display = 'block';
-        return;
-      }
-      document.getElementById('err2').style.display = 'none';
-      showScreen('s3');
-    }
-
-    function nextFromAltura(){
-      const v = parseFloat(document.getElementById('altura').value);
-      if (!v || v < 120 || v > 230){
-        document.getElementById('err3').style.display = 'block';
-        return;
-      }
-      document.getElementById('err3').style.display = 'none';
-      showScreen('s4');
-    }
-
-    function answerClinical(val, nextScreen){
-      clinicalScore += val;
-      showScreen(nextScreen);
-    }
-
-    function calculateResult(){
-      const cintura = parseFloat(document.getElementById('cintura').value);
-      const altura = parseFloat(document.getElementById('altura').value);
-      const ica = cintura / altura;
-
-      let title = "";
-      let text = "";
-      let cls = "";
-
-      // Regla simple: ICA + clínicas
-      if (ica < 0.5 && clinicalScore === 0) {
-        title = "🟢 Resultado: Riesgo cardiometabólico bajo";
-        text  = "Tu índice cintura-altura está en un rango favorable y no aparecen señales claras de alarma. Aun así, la obesidad y el riesgo metabólico cambian con el tiempo, el estrés y la edad.";
-        cls   = "low";
-      } else if (ica < 0.6 || clinicalScore === 1) {
-        title = "🟠 Resultado: Señales de alerta metabólica";
-        text  = "Tu resultado sugiere que la grasa abdominal podría estar empezando a afectar a tu salud. Esto no se detecta bien solo con el peso o el IMC.";
-        cls   = "moderate";
-      } else {
-        title = "🔴 Resultado: Riesgo cardiometabólico elevado";
-        text  = "Tu índice cintura-altura y tus respuestas indican un riesgo aumentado. No es un diagnóstico, pero sí una señal clara para valorar tu caso con un profesional.";
-        cls   = "high";
-      }
-
-      // Guardar global para enviar a Google Sheets
-      window.__ica = Number(ica.toFixed(2));
-      window.__riesgo = cls;
-
-      // Pintar en pantalla
-      document.getElementById('resultTitle').innerText = title;
-      document.getElementById('resultText').innerText  = text;
-      document.getElementById('icaValue').textContent  = window.__ica.toFixed(2);
-
-      const box = document.getElementById('resultBox');
-      box.className = 'resultBox ' + cls;
-
-      // Semáforo + barra + badge
-      const luzVerde = document.getElementById('luzVerde');
-      const luzAmbar = document.getElementById('luzAmbar');
-      const luzRoja  = document.getElementById('luzRoja');
-      const riskFill = document.getElementById('riskFill');
-      const riskBadge= document.getElementById('riskBadge');
-
-      // reset
-      luzVerde.classList.remove('on');
-      luzAmbar.classList.remove('on');
-      luzRoja.classList.remove('on');
-
-      // barra
-      riskFill.className = 'riskfill';
-      if (cls === 'moderate') riskFill.classList.add('moderate');
-      if (cls === 'high') riskFill.classList.add('high');
-
-      // badge
-      riskBadge.className = 'badge ' + cls;
-
-      if (cls === 'low'){
-        luzVerde.classList.add('on');
-        riskBadge.textContent = 'Bajo';
-      } else if (cls === 'moderate'){
-        luzAmbar.classList.add('on');
-        riskBadge.textContent = 'Moderado';
-      } else {
-        luzRoja.classList.add('on');
-        riskBadge.textContent = 'Elevado';
-      }
-    }
-
-    // Enviar leads + mostrar resultado (obligatorio)
-    function submitLeadsAndResult(){
-      const nombre = document.getElementById('leadNombre').value.trim();
-      const email  = document.getElementById('leadEmail').value.trim();
-      const tel    = document.getElementById('leadTel').value.trim();
-
-      // Obligatorio sí o sí
-      if (!nombre || !isEmailValid(email) || !tel){
-        document.getElementById('err7').style.display = 'block';
-        return;
-      }
-      document.getElementById('err7').style.display = 'none';
-
-      // Calcular resultado antes de enviar (para tener ICA y riesgo)
-      calculateResult();
-
-      const payload = new URLSearchParams({
-        nombre: nombre,
-        email: email,
-        telefono: tel,
-        ica: (window.__ica ?? "").toString(),
-        riesgo: (window.__riesgo ?? "").toString()
-      });
-
-      // Guardar en Google Sheets (modo no-cors para que no rompa)
-      fetch(WEBAPP_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-        body: payload.toString()
-      });
-
-      showScreen('s8');
-    }
-
-    // Seguridad: siempre arranca en s1 aunque haya caché rara
-    showScreen('s1');
-  </script>
+// BLOQUEO REINTENTOS
+if(localStorage.getItem("ica_done")){
+  alert("Este test solo puede realizarse una vez.");
+}
+</script>
 
 </body>
 </html>
