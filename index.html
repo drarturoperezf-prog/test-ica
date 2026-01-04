@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Test ICA · Riesgo cardiometabólico</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #ffffff;
+      color: #111;
+      margin: 0;
+      padding: 0;
+    }
+    .screen {
+      display: none;
+      padding: 24px;
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100vh;
+      box-sizing: border-box;
+    }
+    .screen.active {
+      display: block;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+    }
+    .small {
+      font-size: 14px;
+      color: #555;
+      margin-top: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      margin-top: 20px;
+      box-sizing: border-box;
+    }
+    .btn {
+      display: block;
+      width: 100%;
+      margin-top: 30px;
+      padding: 16px;
+      font-size: 18px;
+      background: #000;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+    .btn.secondary {
+      background: #eee;
+      color: #000;
+      margin-top: 12px;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 16px;
+      border-radius: 6px;
+    }
+    .low { background: #e6f7e6; }
+    .moderate { background: #fff3cd; }
+    .high { background: #f8d7da; }
+    a.btn {
+      text-align: center;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- PANTALLA 1 -->
+<div class="screen active" id="s1">
+  <h1>¿Tu grasa abdominal está poniendo en riesgo tu salud?</h1>
+  <p>
+    Este test rápido se basa en el índice cintura-altura (ICA), un marcador más útil
+    que el peso para valorar riesgo cardiometabólico.
+  </p>
+  <p class="small">⏱ 2 minutos · No es un diagnóstico médico.</p>
+  <button class="btn" onclick="next(2)">Empezar el test</button>
+</div>
+
+<!-- PANTALLA 2 -->
+<div class="screen" id="s2">
+  <h1>¿Cuál es tu perímetro de cintura? (en cm)</h1>
+  <p class="small">Mídela a la altura del ombligo, sin apretar.</p>
+  <input type="number" id="cintura" placeholder="Ej. 95">
+  <button class="btn" onclick="next(3)">Siguiente</button>
+</div>
+
+<!-- PANTALLA 3 -->
+<div class="screen" id="s3">
+  <h1>¿Cuál es tu altura? (en cm)</h1>
+  <input type="number" id="altura" placeholder="Ej. 170">
+  <button class="btn" onclick="next(4)">Siguiente</button>
+</div>
+
+<!-- PANTALLA 4 -->
+<div class="screen" id="s4">
+  <h1>¿Te cuesta especialmente perder grasa abdominal aunque hagas dieta o ejercicio?</h1>
+  <button class="btn" onclick="answer(1,5)">Sí</button>
+  <button class="btn secondary" onclick="answer(0,5)">No</button>
+</div>
+
+<!-- PANTALLA 5 -->
+<div class="screen" id="s5">
+  <h1>¿Has recuperado peso varias veces después de haberlo perdido?</h1>
+  <button class="btn" onclick="answer(1,6)">Sí</button>
+  <button class="btn secondary" onclick="answer(0,6)">No</button>
+</div>
+
+<!-- PANTALLA 6 -->
+<div class="screen" id="s6">
+  <h1>¿Tienes o te han dicho alguna vez que tienes la tensión, el azúcar o el colesterol altos?</h1>
+  <button class="btn" onclick="answer(1,7)">Sí</button>
+  <button class="btn secondary" onclick="answer(0,7)">No</button>
+</div>
+
+<!-- PANTALLA 7 · RESULTADO -->
+<div class="screen" id="s7">
+  <h1 id="resultTitle"></h1>
+  <div class="result" id="resultBox">
+    <p id="resultText"></p>
+  </div>
+  <a class="btn" href="https://instagram.com/" target="_blank">
+    Escribirme por Instagram
+  </a>
+</div>
+
+<script>
+  let clinicalScore = 0;
+
+  function next(n) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('s' + n).classList.add('active');
+  }
+
+  function answer(val, nextScreen) {
+    clinicalScore += val;
+    next(nextScreen);
+    if (nextScreen === 7) calculateResult();
+  }
+
+  function calculateResult() {
+    const cintura = parseFloat(document.getElementById('cintura').value);
+    const altura = parseFloat(document.getElementById('altura').value);
+
+    const ica = cintura / altura;
+
+    let title = "";
+    let text = "";
+    let cls = "";
+
+    if (ica < 0.5 && clinicalScore === 0) {
+      title = "Resultado: Riesgo cardiometabólico bajo";
+      text = "Tu índice cintura-altura está en un rango favorable y no aparecen señales claras de alarma. Aun así, el riesgo metabólico puede cambiar con el tiempo.";
+      cls = "low";
+    } else if (ica < 0.6 || clinicalScore === 1) {
+      title = "Resultado: Señales de alerta metabólica";
+      text = "Tu resultado sugiere que la grasa abdominal podría estar empezando a afectar a tu salud. Esto no se detecta bien solo con el peso o el IMC.";
+      cls = "moderate";
+    } else {
+      title = "Resultado: Riesgo cardiometabólico elevado";
+      text = "Tu índice cintura-altura y tus respuestas indican un riesgo aumentado. No es un diagnóstico, pero sí una señal clara para valorar tu caso con un profesional.";
+      cls = "high";
+    }
+
+    document.getElementById('resultTitle').innerText = title;
+    document.getElementById('resultText').innerText = text;
+    document.getElementById('resultBox').className = "result " + cls;
+  }
+</script>
+
+</body>
+</html>
